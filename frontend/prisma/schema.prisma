@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  AGENCY_ADMIN
+  CLIENT
+}
+
+enum Sentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  FAILED
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+  profiles  BusinessProfile[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(CLIENT)
+  tenantId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id])
+}
+
+model BusinessProfile {
+  id               String   @id @default(uuid())
+  tenantId         String
+  googleLocationId String   @unique
+  name             String
+  address          String?
+  phone            String?
+  website          String?
+  categories       String[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  tenant           Tenant   @relation(fields: [tenantId], references: [id])
+  reviews          Review[]
+  posts            Post[]
+}
+
+model Review {
+  id            String    @id @default(uuid())
+  businessId    String
+  reviewId      String    @unique
+  reviewerName  String
+  rating        Int
+  comment       String?
+  reply         String?
+  sentiment     Sentiment?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  business      BusinessProfile @relation(fields: [businessId], references: [id])
+}
+
+model Post {
+  id            String     @id @default(uuid())
+  businessId    String
+  content       String
+  imageUrl      String?
+  scheduledTime DateTime?
+  status        PostStatus @default(DRAFT)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  business      BusinessProfile @relation(fields: [businessId], references: [id])
+}
