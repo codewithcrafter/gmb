@@ -52,7 +52,7 @@ export default function SignupPage() {
     setError("");
     setIsGoogleSubmitting(true);
     try {
-      const res = await fetch("http://localhost:8000/api/auth/google/login", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google/login`, {
         method: "GET",
         credentials: "include",
       });
@@ -89,7 +89,7 @@ export default function SignupPage() {
       {/* Signup Form Card */}
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="surface-card p-8 shadow-sm space-y-6">
-          
+
           {error && (
             <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-100 flex items-start gap-2 text-rose-700 text-xs font-medium">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
